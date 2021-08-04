@@ -1,14 +1,14 @@
 <template>
   <div id="app">
     <v-app>
-      <v-navigation-drawer app
+      <v-navigation-drawer app clipped
           v-model="drawer"
           :mini-variant.sync="mini"
           permanent
         >
           <v-list-item class="px-2">
             <v-list-item-avatar>
-              <v-img src="https://randomuser.me/api/portraits/men/85.jpg"></v-img>
+              <v-img src="https://adolfocunquero.github.io/Proyecto1/img/TecnoGlobal2.png"></v-img>
             </v-list-item-avatar>
     
             <v-list-item-title>Administrador</v-list-item-title>
@@ -27,8 +27,9 @@
             <v-list-item
               v-for="item in items"
               :key="item.title" 
-              class="text-md-left"
+              class="text-md-left text-sm-left text-xs-left"
               link
+              @click="$router.push(item.route)"
             >
               <v-list-item-icon>
                 <v-icon>{{item.icon}}</v-icon>
@@ -36,14 +37,16 @@
     
               <v-list-item-content>
                 <!-- <router-link :to="item.route"><v-list-item-title>{{item.title}}</v-list-item-title></router-link> -->
-                <v-list-item-title><router-link :to="item.route" class="text-decoration-none">{{ item.title }}</router-link></v-list-item-title>
+                <v-list-item-title>
+                  {{ item.title }}
+                </v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list>
       </v-navigation-drawer>
 
-      <v-app-bar color="primary" app>
-        <v-toolbar-title >Categorias</v-toolbar-title>
+      <v-app-bar color="primary" app clipped-left>
+        <v-toolbar-title style="color:white;" >Tecno Global</v-toolbar-title>
       </v-app-bar>
 
     <!-- Sizes your content based upon application components -->
@@ -83,7 +86,7 @@ export default({
         { title: 'Home', icon: mdiHome, route:'/' },
         //{ title: 'About', icon: mdiHome, route:'/about' },
         { title: 'Categorias', icon: mdiShape, route:'/category' },
-        { title: 'Productos', icon: mdiLaptop, route:'/category' },
+        { title: 'Productos', icon: mdiLaptop, route:'/product' },
         { title: 'Ventas', icon: mdiPointOfSale, route:'/category' },
       ],
       mini: false,
@@ -107,16 +110,4 @@ export default({
   color: #2c3e50;
 }
 
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
 </style>

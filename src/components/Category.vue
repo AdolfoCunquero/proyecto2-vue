@@ -13,7 +13,7 @@
             <v-toolbar-title>Categorias</v-toolbar-title>
             <v-divider class="mx-4" inset vertical></v-divider>
             <v-spacer></v-spacer>
-            <v-text-field class="text-xs-center" v-model="search"  label="Busqueda" single-line  hide-details></v-text-field>
+            <v-text-field class="text-xs-center" v-model="search"  label="Busqueda" :append-icon="icons.mdiMagnify " single-line  hide-details></v-text-field>
             <v-spacer></v-spacer>
             <v-dialog v-model="dialog" max-width="500px">
               <template v-slot:activator="{ on, attrs }">
@@ -105,6 +105,9 @@
 <script>
 
 import axios from 'axios'
+import {
+  mdiMagnify 
+} from '@mdi/js'
 
 export default {
   data() {
@@ -127,12 +130,15 @@ export default {
       editedIndex: -1,
       editedItem: {
         category_name: "",
-        is_active: 0,
+        is_active: 1,
       },
       defaultItem: {
         category_name: "",
         is_active: 1,
       },
+      icons:{
+        mdiMagnify ,
+      }
     };
   },
   computed: {
@@ -186,12 +192,10 @@ export default {
     deleteItemConfirm() {
       this.overlay = true;
       let $this = this;
-
       let deleted_item = this.categories[this.editedIndex]
-
       let edited_index = this.editedIndex
 
-      axios.delete("http://localhost:8000/api/category/"+deleted_item.id).then(()=>{
+      axios.delete("http://localhost:8000/api/category/"+deleted_item.category_id).then(()=>{
           $this.categories.splice(edited_index, 1);
           console.log(JSON.stringify($this.categories[edited_index]))
           $this.overlay = false;
@@ -220,17 +224,8 @@ export default {
       this.overlay = true;
       if (this.editedIndex > -1) {
         let $this = this;
-        //let edited_index = this.editedIndex;
 
-        
-
-        axios.put("http://localhost:8000/api/category/"+this.editedItem.id.toString() ,this.editedItem).then(()=>{
-            // let data = response.data
-            // data.text_active = $this.get_status_text(data.is_active)
-
-            // console.log(data)
-            // Object.assign($this.categories[edited_index], data);
-            // $this.overlay = false;
+        axios.put("http://localhost:8000/api/category/"+this.editedItem.category_id ,this.editedItem).then(()=>{
             $this.initialize();
         })
 
