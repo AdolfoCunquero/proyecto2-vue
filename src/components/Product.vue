@@ -122,7 +122,7 @@
             </v-dialog>
           </v-toolbar>
         </template>
-        <template v-slot:item.actions="{ item }">
+        <template v-slot:[`item.actions`]="{ item }">
           <v-icon small class="mr-2" @click="editItem(item)">
             mdi-pencil
           </v-icon>
@@ -240,10 +240,11 @@ export default {
     initialize() {
         let $this = this;
         this.overlay = true;
-        axios.get("http://localhost:8000/api/article").then((response)=>{
+        
+        axios.get("article").then((response)=>{
             $this.products = response.data
             $this.products.forEach(function(item){
-              item.image_path = "http://localhost:8000/api/"+item.image_path;
+              item.image_path = axios.defaults.baseURL+"images/"+item.image_path;
               item.text_active = $this.get_status_text(item.is_active)
             })
             $this.overlay = false;
@@ -268,7 +269,7 @@ export default {
       let deleted_item = this.products[this.editedIndex]
       let edited_index = this.editedIndex
 
-      axios.delete("http://localhost:8000/api/article/"+deleted_item.article_id).then(()=>{
+      axios.delete("article/"+deleted_item.article_id).then(()=>{
           $this.products.splice(edited_index, 1);
           console.log(JSON.stringify($this.products[edited_index]))
           $this.overlay = false;
@@ -312,7 +313,7 @@ export default {
         formData.append('is_active',this.editedItem.is_active);
         let $this = this;
 
-        axios.post("http://localhost:8000/api/article/"+this.editedItem.article_id.toString()+'?_method=PUT', formData, {
+        axios.post("article/"+this.editedItem.article_id.toString()+'?_method=PUT', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -332,7 +333,7 @@ export default {
         formData.append('is_active',this.editedItem.is_active);
         let $this = this;
 
-        axios.post("http://localhost:8000/api/article",formData, {
+        axios.post("article",formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

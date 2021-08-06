@@ -1,32 +1,61 @@
 <template>
   <v-container>
+   
     <v-row class="text-center">
-      <v-col cols="6">
+      <v-col cols="4">
         <v-img
-          :src="require('../assets/vuetify.png')"
+          :src="require('../assets/php.svg')"
           class="my-3"
           contain
-          height="200"
+          height="125"
         />
       </v-col>
-      <v-col cols="6">
-        <img alt="Vue logo" height="200" src="../assets/vue.png">
-      </v-col>
-    </v-row>
-    <v-row class="text-center">
-      <v-col cols="6">
+      <v-col cols="4">
         <v-img
           :src="require('../assets/laravel.png')"
           class="my-3"
           contain
-          height="200"
+          height="150"
         />
       </v-col>
-      <v-col cols="6">
-        <img alt="Vue logo" height="200" src="../assets/mysql.png">
+      <v-col cols="4">
+        <v-img
+          :src="require('../assets/mysql.png')"
+          class="my-3"
+          contain
+          height="150"
+        />
       </v-col>
 
     </v-row>
+
+    <v-row class="text-center">
+      <v-col cols="4">
+        <v-img
+          :src="require('../assets/heroku.png')"
+          class="my-3"
+          contain
+          height="150"
+        />
+      </v-col>
+      <v-col cols="4">
+        <v-img
+          :src="require('../assets/vue.png')"
+          class="my-3"
+          contain
+          height="150"
+        />
+      </v-col>
+      <v-col cols="4">
+        <v-img
+          :src="require('../assets/s3.png')"
+          class="my-3"
+          contain
+          height="150"
+        />
+      </v-col>
+    </v-row>
+
   </v-container>
 </template>
 

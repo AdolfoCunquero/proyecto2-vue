@@ -83,7 +83,7 @@
             </v-dialog>
           </v-toolbar>
         </template>
-        <template v-slot:item.actions="{ item }">
+        <template v-slot:[`item.actions`]="{ item }">
           <v-icon small class="mr-2" @click="editItem(item)">
             mdi-pencil
           </v-icon>
@@ -168,7 +168,7 @@ export default {
     initialize() {
         let $this = this;
         this.overlay = true;
-        axios.get("http://localhost:8000/api/category").then((response)=>{
+        axios.get("category").then((response)=>{
             $this.categories = response.data
             $this.categories.forEach(function(item){
               item.text_active = $this.get_status_text(item.is_active)
@@ -195,7 +195,7 @@ export default {
       let deleted_item = this.categories[this.editedIndex]
       let edited_index = this.editedIndex
 
-      axios.delete("http://localhost:8000/api/category/"+deleted_item.category_id).then(()=>{
+      axios.delete("category/"+deleted_item.category_id).then(()=>{
           $this.categories.splice(edited_index, 1);
           console.log(JSON.stringify($this.categories[edited_index]))
           $this.overlay = false;
@@ -225,13 +225,13 @@ export default {
       if (this.editedIndex > -1) {
         let $this = this;
 
-        axios.put("http://localhost:8000/api/category/"+this.editedItem.category_id ,this.editedItem).then(()=>{
+        axios.put("category/"+this.editedItem.category_id ,this.editedItem).then(()=>{
             $this.initialize();
         })
 
       } else {
         let $this = this;
-        axios.post("http://localhost:8000/api/category",this.editedItem).then((response)=>{
+        axios.post("category",this.editedItem).then((response)=>{
             let data = response.data
             data.text_active = $this.get_status_text(data.is_active)
             $this.categories.push(data);
