@@ -15,7 +15,7 @@
             <v-spacer></v-spacer>
             <v-text-field class="text-xs-center" v-model="search"  label="Busqueda" :append-icon="icons.mdiMagnify " single-line  hide-details></v-text-field>
             <v-spacer></v-spacer>
-            <v-dialog v-model="dialog" max-width="900px">
+            <v-dialog v-model="dialog" max-width="700px">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   color="primary"
@@ -34,104 +34,99 @@
 
                 <v-card-text>
                   <v-container>
-                    <v-row >
-                      <v-col cols="12" sm="12" md="6" class="p-0">
-                        <v-select
-                          :items="aviable_customers"
-                          label="Cliente"
-                          v-model="editedItem.customer_id"
-                          item-text="customer_name"
-                          item-value="customer_id"
-                        >
-                          <template v-slot:item="{ item, attrs, on }">
-                            <v-list-item
-                              v-bind="attrs"
-                              v-on="on"
-                            >
-                              <v-list-item-title
-                                :id="attrs['aria-labelledby']"
-                                v-text="item.customer_name"
-                                class="text-left"
-                              ></v-list-item-title>
-                            </v-list-item>
-                          </template>
-                        </v-select>
-                      </v-col>
-                      <v-col cols="12" sm="12" md="6" class="p-0">
-                        
-
-                        <v-menu
-                            ref="menu"
-                            v-model="menu"
-                            :close-on-content-click="false"
-                            :return-value.sync="editedItem.order_date"
-                            transition="scale-transition"
-                            offset-y
-                            min-width="auto"
-                        >
-                            <template v-slot:activator="{ on, attrs }">
-                            <v-text-field
-                                v-model="editedItem.order_date"
-                                label="Fecha Venta"
-                                readonly
+                    <v-form
+                      lazy-validation
+                      ref="form"
+                      v-model="add_sale_valid"
+                    >
+                      <v-row >
+                        <v-col cols="12" sm="12" md="6" class="p-0">
+                          <v-select
+                            :items="aviable_customers"
+                            label="Cliente"
+                            v-model="editedItem.customer_id"
+                            item-text="customer_name"
+                            item-value="customer_id"
+                            required
+                            :rules="customer_id_rules"
+                          >
+                            <template v-slot:item="{ item, attrs, on }">
+                              <v-list-item
                                 v-bind="attrs"
                                 v-on="on"
-                            ></v-text-field>
+                              >
+                                <v-list-item-title
+                                  :id="attrs['aria-labelledby']"
+                                  v-text="item.customer_name"
+                                  class="text-left"
+                                ></v-list-item-title>
+                              </v-list-item>
                             </template>
-                            <v-date-picker
-                            v-model="editedItem.order_date"
-                            no-title
-                            scrollable
-                            >
-                            <v-spacer></v-spacer>
-                            <v-btn
-                                text
-                                color="primary"
-                                @click="menu = false"
-                            >
-                                Cancel
-                            </v-btn>
-                            <v-btn
-                                text
-                                color="primary"
-                                @click="$refs.menu.save(editedItem.order_date)"
-                            >
-                                OK
-                            </v-btn>
-                            </v-date-picker>
-                        </v-menu>
-
-
-
-                      </v-col>
-                    </v-row>
-                    <v-row>
-                      <v-col cols="12" sm="12" md="4" class="p-0">
-                       <v-checkbox
-                        v-model="editedItem.is_active"
-                        label="Activo"
-                      ></v-checkbox>
-                      </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" md="12" sm="12">
-                            <v-data-table
-                                :headers="headers_detail_product"
-                                :items="editedItem.products"
-                                :items-per-page="5"
-                                class="elevation-1"
-                            ></v-data-table>
+                          </v-select>
                         </v-col>
-                    </v-row>
+                        <v-col cols="12" sm="12" md="6" class="p-0">
+                          <v-menu
+                              ref="menu"
+                              v-model="menu"
+                              :close-on-content-click="false"
+                              :return-value.sync="editedItem.order_date"
+                              transition="scale-transition"
+                              offset-y
+                              min-width="auto"
+                          >
+                              <template v-slot:activator="{ on, attrs }">
+                              <v-text-field
+                                  v-model="editedItem.order_date"
+                                  label="Fecha Venta"
+                                  readonly
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  required
+                              ></v-text-field>
+                              </template>
+                              <v-date-picker
+                              v-model="editedItem.order_date"
+                              no-title
+                              scrollable
+                              >
+                              <v-spacer></v-spacer>
+                              <v-btn
+                                  text
+                                  color="primary"
+                                  @click="menu = false"
+                              >
+                                  Cancel
+                              </v-btn>
+                              <v-btn
+                                  text
+                                  color="primary"
+                                  @click="$refs.menu.save(editedItem.order_date)"
+                              >
+                                  OK
+                              </v-btn>
+                              </v-date-picker>
+                          </v-menu>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col cols="12" sm="12" md="4" class="p-0">
+                        <v-checkbox
+                          v-model="editedItem.is_active"
+                          label="Activo"
+                        ></v-checkbox>
+                        </v-col>
+                      </v-row>
+                    </v-form>
                   </v-container>
                 </v-card-text>
 
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" text @click="close">
+                  <v-btn color="red darken-1" text @click="close">
                     Cancelar
                   </v-btn>
-                  <v-btn color="blue darken-1" text @click="save"> Guardar </v-btn>
+                  <v-btn color="blue darken-1"  text @click="save(false)"> Guardar</v-btn>
+                  <v-btn color="blue darken-1" text @click="save_and_add_products"> Guardar y agregar productos</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -143,10 +138,59 @@
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="blue darken-1" text @click="closeDelete"
-                    >Cancelar</v-btn
-                  >
+                    >Cancelar</v-btn>
                   <v-btn color="blue darken-1" text @click="deleteItemConfirm"
-                    >Aceptar</v-btn
+                    >Aceptar</v-btn>
+                  <v-spacer></v-spacer>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+            <v-dialog v-model="dialogReport" max-width="1000px">
+              <v-card>
+                <v-card-title>
+                  <span class="text-h5">Orden de Venta - Tecno Global</span>
+                </v-card-title>
+
+                <v-card-text>
+                  <v-container>
+                    <v-row >
+                        <v-col cols="12" md="6" sm="12" class="text-left p-0">
+                          <strong>No. Orden: </strong><label>{{order_report.order_id}}</label>
+                        </v-col>
+                         <v-col cols="12" md="6" sm="12" class="text-left p-0">
+                          <strong>Fecha: </strong><label>{{order_report.order_date}}</label>
+                        </v-col>
+                    </v-row>
+                    <v-row >
+                        <v-col cols="12" md="12" sm="12" class="text-left p-0">
+                          <strong>Nombre Cliente: </strong><label>{{order_report.customer_name}}</label>
+                        </v-col>
+                         <v-col cols="12" md="12" sm="12" class="text-left p-0">
+                          <strong>Direccion: </strong><label>{{order_report.address}}</label>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col cols="12" md="12" sm="12" class="">
+                        <v-data-table
+                          dense
+                          :headers="headers_report"
+                          :items="order_report.products"
+                          item-key="article_id"
+                          class="elevation-1"
+                        ></v-data-table>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col cols="12" md="12" sm="12" class="text-right">
+                        <strong class="text-h6">Total: {{order_report.total}}</strong>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="blue darken-1" text @click="closeReport"
+                    >Cerrar</v-btn
                   >
                   <v-spacer></v-spacer>
                 </v-card-actions>
@@ -155,10 +199,9 @@
           </v-toolbar>
         </template>
         <template v-slot:[`item.actions`]="{ item }">
-          <v-icon small class="mr-2" @click="editItem(item)">
-            mdi-pencil
-          </v-icon>
-          <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+          <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
+          <v-icon small class="mr-2" @click="deleteItem(item)"> mdi-delete </v-icon>
+          <v-icon small @click="showReport(item)"> mdi-file-chart </v-icon>
         </template>
         <template v-slot:no-data>
           <v-btn  @click="initialize"> No hay datos disponibles </v-btn>
@@ -183,11 +226,16 @@ import {
 export default {
   data() {
     return {
+      customer_id_rules: [
+        v => (v && v != 0) || 'Debe seleccionar un cliente',
+      ],
+      add_sale_valid:false,
       menu: false,
       search:'',
       overlay:false,
       dialog: false,
       dialogDelete: false,
+      dialogReport:false,
       headers: [
         {
           text: "No. Documento",
@@ -210,26 +258,6 @@ export default {
         { text: "Estado", value: "text_active" },
         { text: 'Acciones', value: 'actions', sortable: false },
       ],
-      headers_detail_product:[
-          {
-            text: "Nombre Producto",
-            align: "left",
-            sortable: true,
-            value: "article_name",
-          },
-          {
-            text: "Precio Unitario",
-            align: "left",
-            sortable: true,
-            value: "unit_price",
-          },
-          {
-            text: "Cantidad",
-            align: "left",
-            sortable: true,
-            value: "quantity",
-          },
-      ],
       orders: [],
       editedIndex: -1,
       editedItem: {
@@ -247,7 +275,42 @@ export default {
       icons:{
         mdiMagnify ,
       },
-      aviable_customers:[]
+      aviable_customers:[],
+      headers_report:[
+        {
+          text: 'Producto',
+          align: 'start',
+          sortable: false,
+          value: 'article_name',
+        },
+        {
+          text: 'Precio unitario',
+          align: 'start',
+          sortable: false,
+          value: 'unit_price',
+        },
+        {
+          text: 'Cantidad',
+          align: 'start',
+          sortable: false,
+          value: 'quantity',
+        },
+        {
+          text: 'Subtotal',
+          align: 'start',
+          sortable: false,
+          value: 'subtotal',
+        },
+      ],
+      order_report:{
+        order_id:0,
+        customer_name:"",
+        order_date:"",
+        address:"",
+        nit:"",
+        total:0,
+        products:[]
+      }
     };
   },
   computed: {
@@ -284,6 +347,22 @@ export default {
         return 'Inactivo'
       }
     },
+    showReport(item){
+      this.overlay = true
+      this.order_report = Object.assign({}, item);
+      let $this = this;
+      axios.get("orderDetail/"+item.order_id.toString()).then((response)=>{
+        let total = 0;
+        $this.order_report.products = response.data
+        $this.order_report.products.forEach(function(item){
+          item.subtotal = item.unit_price * item.quantity;
+          total += item.subtotal;
+        })
+        $this.order_report.total = total;
+        $this.overlay = false;
+        $this.dialogReport = true;
+      })
+    },
     initialize() {
         let $this = this;
         this.overlay = true;
@@ -301,7 +380,6 @@ export default {
     editItem(item) {
       this.editedIndex = this.orders.indexOf(item);
       this.editedItem = Object.assign({}, item);
-      this.editedItem.products = [];
       this.dialog = true;
     },
 
@@ -335,6 +413,9 @@ export default {
         this.editedIndex = -1;
       });
     },
+    closeReport(){
+      this.dialogReport = false;
+    },
 
     closeDelete() {
       this.dialogDelete = false;
@@ -344,22 +425,48 @@ export default {
       });
     },
 
-    save() {
+    redirect_order_detail(order_id){
+      this.$router.push({
+        name:"order_detail",
+        params:{
+          order_id: order_id,
+        }
+      })
+    },
+
+    save_and_add_products(){
+      this.save(true);
+    },
+
+    save(add_products) {
+      this.$refs.form.validate();
+      
       this.overlay = true;
       if (this.editedIndex > -1) {
         let $this = this;
+        let order_id = this.editedItem.order_id;
 
         axios.put("order/"+this.editedItem.order_id ,this.editedItem).then(()=>{
-            $this.initialize();
+            if(add_products){
+              $this.redirect_order_detail(order_id);
+            }else{
+              $this.initialize();
+            }
+            
         })
 
       } else {
         let $this = this;
         axios.post("order",this.editedItem).then((response)=>{
             let data = response.data
-            data.text_active = $this.get_status_text(data.is_active)
-            $this.orders.push(data);
-            $this.overlay = false;
+            if(add_products){
+              $this.redirect_order_detail(data.order_id);
+            }else{
+              data.text_active = $this.get_status_text(data.is_active)
+              $this.orders.push(data);
+              $this.overlay = false;
+            }
+            
         })
         
       }

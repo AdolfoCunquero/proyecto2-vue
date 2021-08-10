@@ -7,6 +7,7 @@ import Store from '../views/Store.vue'
 import Login from '../views/Login.vue'
 import Customer from '../views/Customer.vue'
 import Sales from '../views/Sales.vue'
+import OrderDetail from '../views/OrderDetail.vue'
 
 Vue.use(VueRouter)
 
@@ -35,6 +36,11 @@ const routes = [
     path: '/sales',
     name: 'sales',
     component: Sales
+  },
+  {
+    path: '/orderDetail/:order_id',
+    name: 'order_detail',
+    component: OrderDetail
   },
   {
     path: '/login',
