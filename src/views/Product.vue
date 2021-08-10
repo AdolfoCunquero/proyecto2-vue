@@ -11,7 +11,7 @@
 import Product from '@/components/Product.vue'
 
 export default {
-  name: 'Home',
+  name: 'ProductView',
   components: {
     Product
   }

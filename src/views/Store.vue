@@ -1,6 +1,6 @@
 <template>
   <div data-app>
-    <Category/>
+    <Store/>
   </div>
   
 </template>
@@ -8,12 +8,12 @@
 
 <script>
 // @ is an alias to /src
-import Category from '@/components/Category.vue'
+import Store from '@/components/Store.vue'
 
 export default {
-  name: 'CategoryView',
+  name: 'StoreView',
   components: {
-    Category
+    Store
   }
 }
 </script>

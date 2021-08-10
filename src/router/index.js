@@ -3,24 +3,48 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Category from '../views/Category.vue'
 import Product from '../views/Product.vue'
+import Store from '../views/Store.vue'
+import Login from '../views/Login.vue'
+import Customer from '../views/Customer.vue'
+import Sales from '../views/Sales.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home
+    name: 'store',
+    component: Store
   },
   {
     path: '/category',
-    name: 'Categorias',
+    name: 'category',
     component: Category
   },
   {
+    path: '/customer',
+    name: 'customer',
+    component: Customer
+  },
+  {
     path: '/product',
-    name: 'Productos',
+    name: 'product',
     component: Product
+  },
+  {
+    path: '/sales',
+    name: 'sales',
+    component: Sales
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: Login
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: Home
   },
   {
     path: '/about',

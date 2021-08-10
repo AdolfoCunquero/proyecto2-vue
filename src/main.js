@@ -4,7 +4,8 @@ import vuetify from './plugins/vuetify'
 import router from './router'
 import axios from 'axios'
 
-axios.defaults.baseURL = 'https://desarrollowebproyecto2.herokuapp.com/api/'
+//axios.defaults.baseURL = 'https://desarrollowebproyecto2.herokuapp.com/api/'
+axios.defaults.baseURL = 'http://localhost:8000/api/'
 
 Vue.config.productionTip = false
 

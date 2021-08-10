@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <v-app>
-      <v-navigation-drawer app clipped
+      <v-navigation-drawer app clipped v-if="show_navigation_bar()"
           v-model="drawer"
           :mini-variant.sync="mini"
           permanent
@@ -30,7 +30,7 @@
                 :key="i"
                 class="text-md-left text-sm-left text-xs-left"
                 link
-                @click="$router.push(item.route)"
+                @click="change_route(item.route)"
               >
                 <v-list-item-icon>
                   <v-icon>{{item.icon}}</v-icon>
@@ -47,7 +47,7 @@
           </v-list>
       </v-navigation-drawer>
 
-      <v-app-bar color="primary" app clipped-left>
+      <v-app-bar color="primary" app clipped-left v-if="show_top_bar()" >
         <v-toolbar-title style="color:white;" >Tecno Global</v-toolbar-title>
       </v-app-bar>
 
@@ -56,18 +56,16 @@
 
         <!-- Provides the application the proper gutter -->
         <v-container fluid>
-
-          <!-- If using vue-router -->
-          <router-view></router-view>
+            <router-view ></router-view>
         </v-container>
       </v-main>
 
-      <v-footer app>
+      <v-footer app v-if="show_footer()">
         <!-- -->
       </v-footer>
     </v-app>
-
   </div>
+  
 </template>
 
 <script>
@@ -75,9 +73,13 @@
 import {
     mdiHome,
     mdiShape,
-    mdiPointOfSale,
     mdiLaptop,
+    mdiAccountTie,
+    mdiCart,
+    mdiStore
   } from '@mdi/js'
+
+
 
 
 export default({
@@ -86,18 +88,44 @@ export default({
       drawer: true,
       item_active:0,
       items: [
-        { title: 'Home', icon: mdiHome, route:'/' },
+        { title: 'Home', icon: mdiHome, route:'/admin' },
         //{ title: 'About', icon: mdiHome, route:'/about' },
         { title: 'Categorias', icon: mdiShape, route:'/category' },
         { title: 'Productos', icon: mdiLaptop, route:'/product' },
-        { title: 'Ventas', icon: mdiPointOfSale, route:'/category' },
+        { title: 'Clientes', icon: mdiAccountTie, route:'/customer' },
+        { title: 'Ventas', icon: mdiCart , route:'/sales' },
+        { title: 'Tienda', icon: mdiStore , route:'/' }
       ],
       mini: false,
-      icons:{
-        
+      icons:{        
       }
 
    }
+ },
+ components:{
+   
+ },
+ methods:{
+    get_route_name:function(){
+      return this.$router.currentRoute.name;
+    },
+    show_top_bar:function(){
+      return (this.get_route_name() != 'login')
+    },
+    show_navigation_bar:function(){
+      return (this.get_route_name() != 'login' && this.get_route_name() != 'store' )
+    },
+    show_footer: function(){
+      return (this.get_route_name() != "login")
+    },
+    change_route:function(route){
+      if( this.$router.currentRoute.fullPath != route)
+      {
+        this.$router.push(route);
+      }
+      
+    }
+
  }
 })
 </script>
