@@ -34,87 +34,98 @@
 
                 <v-card-text>
                   <v-container>
-                    <v-row >
-                      <v-col cols="12" sm="12" md="12" class="p-0">
-                        <v-select
-                          :items="aviable_categories"
-                          label="Categoria"
-                          v-model="editedItem.category_id"
-                          item-text="category_name"
-                          item-value="category_id"
-                        >
-                          <template v-slot:item="{ item, attrs, on }">
-                            <v-list-item
-                              v-bind="attrs"
-                              v-on="on"
-                            >
-                              <v-list-item-title
-                                :id="attrs['aria-labelledby']"
-                                v-text="item.category_name"
-                                class="text-left"
-                              ></v-list-item-title>
-                            </v-list-item>
-                          </template>
-                        </v-select>
-                      </v-col>
-                    </v-row>
-                    <v-row>
-                      <v-col cols="12" sm="12" md="12" class="p-0">
-                        <v-text-field
-                          v-model="editedItem.article_name"
-                          label="Nombre producto"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="12" md="12" class="p-0">
-                        <v-text-field
-                          v-model="editedItem.description"
-                          label="Descripcion"
-                        ></v-text-field>
-                      </v-col>
-                    </v-row>
-                    <v-row>
-                      <v-col cols="12" sm="12" md="4" class="p-0">
-                        <v-text-field
-                        type="number"
-                          v-model="editedItem.price"
-                          label="Precio"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="12" md="4" class="p-0">
-                        <v-text-field
+                    <v-form
+                      ref="form"
+                      v-model="valid_form"
+                      
+                    >
+                      <v-row >
+                        <v-col cols="12" sm="12" md="12" class="p-0">
+                          <v-autocomplete
+                            :items="aviable_categories"
+                            label="Categoria"
+                            v-model="editedItem.category_id"
+                            item-text="category_name"
+                            item-value="category_id"
+                            :rules="[v => !rules.autocomplete_required || !!v || 'Debe seleccionar una categoria']"
+                          >
+                            <template v-slot:item="{ item, attrs, on }">
+                              <v-list-item
+                                v-bind="attrs"
+                                v-on="on"
+                              >
+                                <v-list-item-title
+                                  :id="attrs['aria-labelledby']"
+                                  v-text="item.category_name"
+                                  class="text-left"
+                                ></v-list-item-title>
+                              </v-list-item>
+                            </template>
+                          </v-autocomplete>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col cols="12" sm="12" md="12" class="p-0">
+                          <v-text-field
+                            v-model="editedItem.article_name"
+                            label="Nombre producto"
+                            :rules="[rules.required]"
+                          ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="12" md="12" class="p-0">
+                          <v-text-field
+                            v-model="editedItem.description"
+                            label="Descripcion"
+                            :rules="[rules.required]"
+                          ></v-text-field>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col cols="12" sm="12" md="4" class="p-0">
+                          <v-text-field
                           type="number"
-                          v-model="editedItem.stock"
-                          label="Existencia"
-                          aria-autocomplete="false"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="12" md="4" class="p-0">
-                       <v-checkbox
-                        v-model="editedItem.is_active"
-                        label="Activo"
-                      ></v-checkbox>
-                      </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col cols="12" sm="12" md="8" class="p-0">
-                            <v-file-input
-                                :rules="rules"
-                                type="file"
-                                accept="image/png, image/jpeg, image/bmp"
-                                placeholder="Selecciona una imagen"
-                                prepend-icon="mdi-camera"
-                                label="Selecciona una imagen"
-                                v-model="file"
-                                ref="file"
-                                id="file"
-                                @change="handleFileUpload()"
-                            ></v-file-input>
-                            <!-- <input type="file" id="file" ref="file" v-on:change="handleFileUpload()"/> -->
+                            v-model="editedItem.price"
+                            label="Precio"
+                            :rules="[rules.required, rules.no_zero]"
+                          ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="12" md="4" class="p-0">
-                            <v-img max-height="150" max-width="150" :src="editedItem.image_path"></v-img>
+                          <v-text-field
+                            type="number"
+                            v-model="editedItem.stock"
+                            label="Existencia"
+                            aria-autocomplete="false"
+                            :rules="[rules.required,rules.no_negative]"
+                          ></v-text-field>
                         </v-col>
-                    </v-row>
+                        <v-col cols="12" sm="12" md="4" class="p-0">
+                        <v-checkbox
+                          v-model="editedItem.is_active"
+                          label="Activo"
+                        ></v-checkbox>
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                          <v-col cols="12" sm="12" md="8" class="p-0">
+                              <v-file-input
+                                  
+                                  type="file"
+                                  accept="image/png, image/jpeg, image/bmp"
+                                  placeholder="Selecciona una imagen"
+                                  prepend-icon="mdi-camera"
+                                  label="Selecciona una imagen"
+                                  v-model="file"
+                                  ref="file"
+                                  id="file"
+                                  @change="handleFileUpload()"
+                              ></v-file-input>
+                              <!-- <input type="file" id="file" ref="file" v-on:change="handleFileUpload()"/> -->
+                          </v-col>
+                          <v-col cols="12" sm="12" md="4" class="p-0">
+                              <v-img max-height="150" max-width="150" :src="editedItem.image_path"></v-img>
+                          </v-col>
+                      </v-row>
+                     </v-form>
                   </v-container>
                 </v-card-text>
 
@@ -176,9 +187,18 @@ export default {
   data() {
     return {
       file:null,
-      rules: [
-        value => !value || value.size < 2000000 || 'La imagen no puede ser mayor a 2 MB!',
-      ],
+      rules: {
+        required: value => value !== "" || 'Campo obligatorio',
+        image_required: value => !!value  || 'Debe seleccionar una imagen',
+        no_zero: value=> value > 0 || 'El campo no puede ser menor o igual a cero',
+        no_negative: value => value >= 0 || 'El campo no puede ser negativo',
+        value:value => !value || value.size < 2000000 || 'La imagen no puede ser mayor a 2 MB!',
+        autocomplete_required: {
+          type: Boolean,
+          default: false,
+        },
+      },
+      valid_form: true,
       search:'',
       overlay:false,
       dialog: false,
@@ -224,7 +244,7 @@ export default {
       },
       defaultItem: {
         article_name: "",
-        descriptionl:"",
+        description:"",
         image_path:"",
         category_id:0,
         is_active: 1,
@@ -269,7 +289,9 @@ export default {
       }
     },
     handleFileUpload(){
+      if(this.file){
         this.editedItem.image_path= URL.createObjectURL(this.file)
+      }
     },
     initialize() {
         let $this = this;
@@ -282,6 +304,9 @@ export default {
               item.text_active = $this.get_status_text(item.is_active)
             })
             $this.overlay = false;
+        }).catch(()=>{
+          this.overlay = false;
+          this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
         })
     },
 
@@ -307,6 +332,9 @@ export default {
           $this.products.splice(edited_index, 1);
           console.log(JSON.stringify($this.products[edited_index]))
           $this.overlay = false;
+      }).catch(()=>{
+        this.overlay = false;
+        this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
       })
       this.closeDelete();
       
@@ -320,6 +348,7 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
+      this.$refs.form.resetValidation();
     },
 
     closeDelete() {
@@ -328,14 +357,26 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
+      if(this.$refs.form){
+        this.$refs.form.resetValidation();
+      }
     },
 
     save() {
+
+      //console.log(this.editedItem.image_path)
+
+      this.$refs.form.validate();
+      if(!this.valid_form){
+        return;
+      }
+
       this.overlay = true;
       let $this = this;
       if (this.editedIndex > -1) {
         
         let formData = new FormData();
+        
         if(this.file != null){
             formData.append('image', this.file, this.file.name);
         }
@@ -354,11 +395,16 @@ export default {
         }).then((response)=>{
             console.log(response)
             $this.initialize();
+        }).catch(()=>{
+          this.overlay = false;
+          this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
         })
 
       } else {
         let formData = new FormData();
-        formData.append('image', this.file,this.file.name);
+        if(this.file != null){
+          formData.append('image', this.file,this.file.name);
+        }
         formData.append('category_id',this.editedItem.category_id);
         formData.append('article_name',this.editedItem.article_name);
         formData.append('description',this.editedItem.description);
@@ -373,10 +419,14 @@ export default {
         }).then(()=>{
             $this.file = null;
             $this.initialize();
+        }).catch(()=>{
+          this.overlay = false;
+          this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
         })
         
       }
       this.close();
+      this.$refs.form.resetValidation();
     },
   },
 };

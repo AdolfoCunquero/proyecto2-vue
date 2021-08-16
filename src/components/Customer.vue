@@ -34,48 +34,71 @@
 
                 <v-card-text>
                   <v-container>
-                    <v-row>
-                      <v-col cols="12" sm="12" md="12" class="p-0">
-                        <v-text-field
-                          v-model="editedItem.first_name"
-                          label="Nombres Cliente"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="12" md="12" class="p-0">
-                        <v-text-field
-                          v-model="editedItem.last_name"
-                          label="Apellidos Cliente"
-                        ></v-text-field>
-                      </v-col>
+                    <v-form
+                      ref="form"
+                      v-model="valid_form"
+                      
+                    >
+                      <v-row>
+                        <v-col cols="12" sm="12" md="6" class="p-0">
+                          <v-text-field
+                            v-model="editedItem.first_name"
+                            label="Nombres Cliente"
+                            :rules="[rules.required]"
+                            autocomplete="disabled"
+                          ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="12" md="6" class="p-0">
+                          <v-text-field
+                            v-model="editedItem.last_name"
+                            label="Apellidos Cliente"
+                            :rules="[rules.required]"
+                            autocomplete="nope"
+                          ></v-text-field>
+                        </v-col>
 
-                      <v-col cols="12" sm="12" md="12" class="p-0">
-                        <v-text-field
-                          v-model="editedItem.email"
-                          label="Email"
-                        ></v-text-field>
-                      </v-col>
+                        <v-col cols="12" sm="12" md="6" class="p-0">
+                          <v-text-field
+                            v-model="editedItem.email"
+                            label="Email"
+                            :rules="[rules.required, rules.email]"
+                            autocomplete="new"
+                          ></v-text-field>
+                        </v-col>
 
-                      <v-col cols="12" sm="12" md="12" class="p-0">
-                        <v-text-field
-                          v-model="editedItem.address"
-                          label="Direccion"
-                        ></v-text-field>
-                      </v-col>
+                        <v-col cols="12" sm="12" md="6" class="p-0">
+                          <v-text-field
+                            v-model="editedItem.nit"
+                            label="NIT"
+                            autocomplete="nope"
+                          ></v-text-field>
+                        </v-col>
 
-                      <v-col cols="12" sm="12" md="12" class="p-0">
-                        <v-text-field
-                          v-model="editedItem.phone"
-                          label="Telefono"
-                        ></v-text-field>
-                      </v-col>
+                        <v-col cols="12" sm="12" md="12" class="p-0">
+                          <v-text-field
+                            v-model="editedItem.address"
+                            label="Direccion"
+                            :rules="[rules.required]"
+                            autocomplete="nope"
+                          ></v-text-field>
+                        </v-col>
 
-                      <v-col cols="12" sm="12" md="12" class="p-0">
-                       <v-checkbox
-                        v-model="editedItem.is_active"
-                        label="Activo"
-                      ></v-checkbox>
-                      </v-col>
-                    </v-row>
+                        <v-col cols="12" sm="12" md="6" class="p-0">
+                          <v-text-field
+                            v-model="editedItem.phone"
+                            label="Telefono"
+                            autocomplete="nope"
+                          ></v-text-field>
+                        </v-col>
+
+                        <v-col cols="12" sm="12" md="6" class="p-0">
+                        <v-checkbox
+                          v-model="editedItem.is_active"
+                          label="Activo"
+                        ></v-checkbox>
+                        </v-col>
+                      </v-row>
+                    </v-form>
                   </v-container>
                 </v-card-text>
 
@@ -136,6 +159,14 @@ import {
 export default {
   data() {
     return {
+      rules: {
+        required: value => !!value || 'Campo obligatorio',
+        email: value => {
+          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          return pattern.test(value) || 'Email no valido'
+        },
+      },
+      valid_form: true,
       search:'',
       overlay:false,
       dialog: false,
@@ -160,6 +191,12 @@ export default {
           value: "email",
         },
         {
+          text: "NIT",
+          align: "left",
+          sortable: true,
+          value: "nit",
+        },
+        {
           text: "Direccion",
           align: "left",
           sortable: true,
@@ -180,6 +217,7 @@ export default {
         email: "",
         first_name:"",
         last_name:"",
+        nit:"",
         address:"",
         phone:"",
         is_active: 1,
@@ -188,6 +226,7 @@ export default {
         email: "",
         first_name:"",
         last_name:"",
+        nit:"",
         address:"",
         phone:"",
         is_active: 1,
@@ -230,6 +269,9 @@ export default {
               item.text_active = $this.get_status_text(item.is_active)
             })
             $this.overlay = false;
+        }).catch(()=>{
+          this.overlay = false;
+          this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
         })
     },
 
@@ -255,6 +297,9 @@ export default {
           $this.customers.splice(edited_index, 1);
           console.log(JSON.stringify($this.customers[edited_index]))
           $this.overlay = false;
+      }).catch(()=>{
+        this.overlay = false;
+        this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
       })
       this.closeDelete();
       
@@ -266,6 +311,7 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
+      this.$refs.form.resetValidation();
     },
 
     closeDelete() {
@@ -274,15 +320,27 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
+      if(this.$refs.form){
+        this.$refs.form.resetValidation();
+      }
     },
 
     save() {
+      this.$refs.form.validate();
+      
+      if(!this.valid_form){
+        return;
+      }
+
       this.overlay = true;
       if (this.editedIndex > -1) {
         let $this = this;
 
         axios.put("customer/"+this.editedItem.customer_id ,this.editedItem).then(()=>{
             $this.initialize();
+        }).catch(()=>{
+          this.overlay = false;
+          this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
         })
 
       } else {
@@ -292,10 +350,14 @@ export default {
             data.text_active = $this.get_status_text(data.is_active)
             $this.customers.push(data);
             $this.overlay = false;
+        }).catch(()=>{
+          this.overlay = false;
+          this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
         })
         
       }
       this.close();
+      this.$refs.form.resetValidation()
     },
   },
 };
@@ -303,8 +365,11 @@ export default {
 
 
 
-<style scoped>
+<style>
 .p-0{
   padding:0px 15px 0px 15px !important;
+}
+.swal2-title, .swal2-html-container, .swal2-confirm {
+  font-family: Arial, Helvetica, sans-serif !important;
 }
 </style>

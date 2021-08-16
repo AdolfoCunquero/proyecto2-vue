@@ -14,20 +14,27 @@
                               :prepend-icon="icons.mdiAccount"
                               name="login"
                               label="Login"
-                              type="text"
+                              v-model="username"
+                              type="email"
+                              autocomplete="none"
                            ></v-text-field>
                            <v-text-field
                               id="password"
+                              v-model="password"
                               :prepend-icon="icons.mdiLock"
                               name="password"
                               label="Password"
                               type="password"
+                              @keydown.enter="login"
                            ></v-text-field>
                         </v-form>
                      </v-card-text>
                      <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn color="primary" @click="login">Login</v-btn>
+                        <v-btn color="primary" @click="login"
+                           :loading="loading"
+                           :disabled="loading"
+                        >Login</v-btn>
                      </v-card-actions>
                   </v-card>
                </v-flex>
@@ -40,7 +47,7 @@
 <script>
 
 import { mdiAccount,mdiLock } from '@mdi/js';
-
+import axios from 'axios'
 
 export default {
    name: 'LoginView',
@@ -49,12 +56,35 @@ export default {
            icons:{
                mdiAccount,
                mdiLock
-           }
+           },
+           username:"",
+           password:"",
+           loading:false
        }
    },
    methods:{
       login: function(){
-         this.$router.push('/admin');
+         let $this = this;
+
+         if(this.username == "" || this.password == ""){
+            this.$swal("Datos incorrectos", "Debe ingresar usuario y contraseña", "error");
+            return;
+         }
+         this.loading = true;
+         axios.post('signin',{email:this.username, password: this.password}).then(function(response){
+            let data = response.data;
+            $this.loading = false;
+            if(data.error){
+               $this.$swal("No autorizado", "Usuario o contraseña incorrecto", "error");
+               $this.username = '';
+               $this.password = '';
+               return;
+            }else{
+               $this.$session.start();
+               $this.$session.set('user', data);
+               $this.$router.push('/admin');
+            }
+         })
       }
    }
    

@@ -42,51 +42,68 @@
 
                 <v-card-text>
                   <v-container>
-                    <v-row >
-                      <v-col cols="12" sm="12" md="12" class="p-0">
-                        <v-select
-                          :items="aviable_products"
-                          label="Producto"
-                          v-model="editedItem.article_id"
-                          item-text="article_name"
-                          item-value="article_id"
-                        >
-                          <template v-slot:item="{ item, attrs, on }">
-                            <v-list-item
-                              v-bind="attrs"
-                              v-on="on"
-                            >
-                              <v-list-item-title
-                                :id="attrs['aria-labelledby']"
-                                v-text="item.article_name"
-                                class="text-left"
-                              ></v-list-item-title>
-                            </v-list-item>
-                          </template>
-                        </v-select>
-                      </v-col>
-                      <v-col cols="12" sm="12" md="12" class="p-0">
-                        <v-text-field
-                          v-model="editedItem.unit_price"
-                          label="Precio Unitario"
-                        ></v-text-field>
-                      </v-col>
-                       <v-col cols="12" sm="12" md="12" class="p-0">
-                        <v-text-field
-                          v-model="editedItem.quantity"
-                          label="Cantidad"
-                        ></v-text-field>
-                      </v-col>
-                    </v-row>
-                    <v-row>
-                      <v-col cols="12" sm="12" md="4" class="p-0">
-                       <v-checkbox
-                        v-model="editedItem.is_active"
-                        label="Activo"
-                      ></v-checkbox>
-                      </v-col>
-                    </v-row>
-                    
+                    <v-form
+                      ref="form"
+                      v-model="valid_form"
+                      
+                    >
+                      <v-row >
+                        <v-col cols="12" sm="12" md="12" class="p-0">
+                          <v-autocomplete
+                            :items="aviable_products"
+                            label="Producto"
+                            v-model="editedItem.article_id"
+                            item-text="article_name"
+                            item-value="article_id"
+                            @change="select_product"
+                            :rules="[v => !rules.autocomplete_required || !!v || 'Debe seleccionar un producto']"
+                          >
+                            <template v-slot:item="{ item, attrs, on }">
+                              <v-list-item
+                                v-bind="attrs"
+                                v-on="on"
+                              >
+                                <v-list-item-title
+                                  :id="attrs['aria-labelledby']"
+                                  v-text="item.article_name"
+                                  class="text-left"
+                                ></v-list-item-title>
+                              </v-list-item>
+                            </template>
+                          </v-autocomplete>
+                        </v-col>
+                        <v-col cols="12" sm="12" md="4" class="p-0">
+                          <v-text-field
+                            v-model="editedItem.quantity"
+                            label="Cantidad"
+                            :rules="[rules.required, rules.no_zero]"
+                            type="number"
+                          ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="12" md="4" class="p-0">
+                          <v-text-field
+                            v-model="editedItem.unit_price"
+                            label="Precio Unitario"
+                            disabled
+                          ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="12" md="4" class="p-0">
+                          <v-text-field
+                            v-model="editedItem.stock"
+                            label="Existencia actual"
+                            disabled
+                          ></v-text-field>
+                        </v-col>
+                      </v-row>
+                      <!-- <v-row>
+                        <v-col cols="12" sm="12" md="4" class="p-0">
+                        <v-checkbox
+                          v-model="editedItem.is_active"
+                          label="Activo"
+                        ></v-checkbox>
+                        </v-col>
+                      </v-row> -->
+                    </v-form>
                   </v-container>
                 </v-card-text>
 
@@ -147,6 +164,15 @@ import {
 export default {
   data() {
     return {
+       rules: {
+        required: value => value !== "" || 'Campo obligatorio',
+        no_zero: value=> value > 0 || 'El campo no puede ser menor o igual a cero',
+        autocomplete_required: {
+          type: Boolean,
+          default: false,
+        },
+      },
+      valid_form: true,
       order_id : this.$route.params.order_id,
       menu: false,
       search:'',
@@ -178,7 +204,7 @@ export default {
           sortable: true,
           value: "quantity",
         },
-        { text: "Estado", value: "text_active" },
+        //{ text: "Estado", value: "text_active" },
         { text: 'Acciones', value: 'actions', sortable: false },
       ],
       order_detail: [],
@@ -188,14 +214,16 @@ export default {
         order_id:0,
         quantity:0,
         unit_price:0,
-        is_active:1
+        is_active:1,
+        stock:0
       },
       defaultItem: {
         article_id:0,
         order_id:0,
         quantity:0,
         unit_price:0,
-        is_active:1
+        is_active:1,
+        stock:0
       },
       icons:{
         mdiMagnify ,
@@ -224,11 +252,16 @@ export default {
     get_products: function(){
       let $this = this;
       axios.get('articleActive/0').then(function(response){
-        $this.aviable_products = response.data;
-        // $this.aviable_products.forEach(function(item){
-        //       item.article_name = item.first_name + " " + item.last_name;
-        // })
+        let products = response.data;
+        $this.aviable_products = products.filter(item => item.stock > 0)
+      }).catch(()=>{
+        this.overlay = false;
+        this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
       })
+    },
+    select_product:function(){
+      this.editedItem.unit_price = this.aviable_products.find(item => item.article_id == this.editedItem.article_id).price;
+      this.editedItem.stock = this.aviable_products.find(item => item.article_id == this.editedItem.article_id).stock;
     },
     get_status_text(status){
       if(status == true || status  ==1){
@@ -247,6 +280,9 @@ export default {
               item.text_active = $this.get_status_text(item.is_active)
             })
             $this.overlay = false;
+        }).catch(()=>{
+          this.overlay = false;
+          this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
         })
     },
 
@@ -272,6 +308,9 @@ export default {
           $this.order_detail.splice(edited_index, 1);
           console.log(JSON.stringify($this.order_detail[edited_index]))
           $this.overlay = false;
+      }).catch(()=>{
+        this.overlay = false;
+        this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
       })
       this.closeDelete();
       
@@ -285,6 +324,7 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
+      this.$refs.form.resetValidation();
     },
 
     closeDelete() {
@@ -293,9 +333,23 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
+      if(this.$refs.form){
+        this.$refs.form.resetValidation();
+      }
     },
 
     save() {
+
+      this.$refs.form.validate();
+      if(!this.valid_form){
+        return;
+      }
+
+      if(this.editedItem.quantity > this.aviable_products.find(item => item.article_id == this.editedItem.article_id).stock){
+        this.$swal("Agregar producto", "La cantidad de producto no esta disponible", "warning");
+        return;
+      }
+
       this.overlay = true;
       this.editedItem.order_id = this.order_id;
       if (this.editedIndex > -1) {
@@ -303,6 +357,9 @@ export default {
 
         axios.put("orderDetail/"+this.editedItem.order_detail_id ,this.editedItem).then(()=>{
             $this.initialize();
+        }).catch(()=>{
+          this.overlay = false;
+          this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
         })
 
       } else {
@@ -310,10 +367,14 @@ export default {
         console.log(this.editedItem)
         axios.post("orderDetail",this.editedItem).then(()=>{
             $this.initialize();
+        }).catch(()=>{
+          this.overlay = false;
+          this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
         })
         
       }
       this.close();
+      this.$refs.form.resetValidation();
     },
   },
 };

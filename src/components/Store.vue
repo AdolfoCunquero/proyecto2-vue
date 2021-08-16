@@ -20,22 +20,23 @@
       dense
       nav
     >
-      <v-list-item
-        v-for="item in categories"
-        :key="item.category_id"
-        link
-        v-model="category_selected"
-        class="text-left"
-        @click="selctCategory(item.category_id)"
-      >
-        <v-list-item-icon>
-          <v-icon>{{ icons.mdiChevronRight  }}</v-icon>
-        </v-list-item-icon>
+      <v-list-item-group v-model="category_selected" color="primary">
+        <v-list-item
+          v-for="item in categories"
+          :key="item.category_id"
+          link
+          class="text-left"
+          @click="selctCategory(item.category_id)"
+        >
+          <v-list-item-icon>
+            <v-icon>{{ icons.mdiChevronRight  }}</v-icon>
+          </v-list-item-icon>
 
-        <v-list-item-content>
-          <v-list-item-title>{{ item.category_name }}</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+          <v-list-item-content>
+            <v-list-item-title>{{ item.category_name }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-item-group>
     </v-list>
   </v-navigation-drawer>
    
@@ -163,14 +164,11 @@
                     
                     </v-img>
 
-                    <v-card-title>{{item.article_name}}</v-card-title>
+                    <v-card-title class="text-center">
+                      <div class="mx-auto">{{item.article_name}}</div>
+                    </v-card-title>
 
-                    <v-card-text style="margin-bottom:75px;">
-                      <v-row
-                        align="center"
-                        class="mx-0"
-                      >
-                      </v-row>
+                    <v-card-text style="margin-bottom:95px;">
                       <div>{{item.description}}</div>
                     </v-card-text>
                     
@@ -296,6 +294,7 @@ export default {
               item.isLoad = false;
             })
             $this.overlay = false;
+            $this.category_selected = 0;
         })
       }
       

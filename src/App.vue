@@ -49,7 +49,25 @@
 
       <v-app-bar color="primary" app clipped-left v-if="show_top_bar()" >
         <v-toolbar-title style="color:white;" >Tecno Global</v-toolbar-title>
+
+        <v-spacer></v-spacer>
+
+        <div class="float-right">  
+          <v-btn
+          color="indigo"
+          @click="logout"
+          style="color:white"
+          small
+          >
+            <v-icon left>
+              {{icons.mdiLogout }}
+            </v-icon>
+            Salir
+          </v-btn>
+        </div>
       </v-app-bar>
+
+      
 
     <!-- Sizes your content based upon application components -->
       <v-main>
@@ -76,7 +94,8 @@ import {
     mdiLaptop,
     mdiAccountTie,
     mdiCart,
-    mdiStore
+    mdiStore,
+    mdiLogout 
   } from '@mdi/js'
 
 
@@ -97,7 +116,8 @@ export default({
         { title: 'Tienda', icon: mdiStore , route:'/' }
       ],
       mini: false,
-      icons:{        
+      icons:{  
+        mdiLogout       
       }
 
    }
@@ -106,6 +126,10 @@ export default({
    
  },
  methods:{
+   logout:function(){
+     this.$session.destroy();
+     this.$router.push("/");
+   },
     get_route_name:function(){
       return this.$router.currentRoute.name;
     },

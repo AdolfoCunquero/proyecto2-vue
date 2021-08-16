@@ -14,6 +14,11 @@ export default {
   name: 'ProductView',
   components: {
     Product
+  },
+  created:function(){
+    if (!this.$session.exists()) {
+      this.$router.push('/');
+    }
   }
 }
 </script>

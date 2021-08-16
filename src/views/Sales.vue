@@ -14,6 +14,11 @@ export default {
   name: 'SalesView',
   components: {
     Sales
+  },
+  created:function(){
+    if (!this.$session.exists()) {
+      this.$router.push('/');
+    }
   }
 }
 </script>

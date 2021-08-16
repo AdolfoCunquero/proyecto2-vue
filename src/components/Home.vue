@@ -56,6 +56,15 @@
           height="100"
         />
       </v-col>
+      <v-col cols="12" md="2" sm="12">
+        <v-img
+          :src="require('../assets/s3.png')"
+          class="my-3"
+          contain
+          style="margin-top:25px !important;"
+          height="100"
+        />
+      </v-col>
     </v-row>
 
   </v-container>
@@ -63,9 +72,14 @@
 
 <script>
   export default {
-    name: 'HelloWorld',
+    name: 'Home',
     data: () => ({
      
     }),
+    created:function(){
+      if (!this.$session.exists()) {
+        this.$router.push('/');
+      }
+    }
   }
 </script>

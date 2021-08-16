@@ -14,6 +14,11 @@ export default {
   name: 'StoreView',
   components: {
     Store
+  },
+  created:function(){
+    if (!this.$session.exists()) {
+      this.$router.push('/');
+    }
   }
 }
 </script>

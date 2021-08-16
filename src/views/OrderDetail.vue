@@ -14,6 +14,11 @@ export default {
   name: 'OrderDetailView',
   components: {
     OrderDetail
+  },
+  created:function(){
+    if (!this.$session.exists()) {
+      this.$router.push('/');
+    }
   }
 }
 </script>

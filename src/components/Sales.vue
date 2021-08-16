@@ -35,20 +35,19 @@
                 <v-card-text>
                   <v-container>
                     <v-form
-                      lazy-validation
                       ref="form"
-                      v-model="add_sale_valid"
+                      v-model="valid_form"
                     >
                       <v-row >
                         <v-col cols="12" sm="12" md="6" class="p-0">
-                          <v-select
+                          <v-autocomplete
                             :items="aviable_customers"
                             label="Cliente"
                             v-model="editedItem.customer_id"
                             item-text="customer_name"
                             item-value="customer_id"
                             required
-                            :rules="customer_id_rules"
+                            :rules="[v => !rules.autocomplete_required || !!v || 'Debe seleccionar un cliente']"
                           >
                             <template v-slot:item="{ item, attrs, on }">
                               <v-list-item
@@ -62,12 +61,13 @@
                                 ></v-list-item-title>
                               </v-list-item>
                             </template>
-                          </v-select>
+                          </v-autocomplete>
                         </v-col>
                         <v-col cols="12" sm="12" md="6" class="p-0">
                           <v-menu
                               ref="menu"
                               v-model="menu"
+                              :rules="[rules.required]"
                               :close-on-content-click="false"
                               :return-value.sync="editedItem.order_date"
                               transition="scale-transition"
@@ -165,8 +165,11 @@
                         <v-col cols="12" md="12" sm="12" class="text-left p-0">
                           <strong>Nombre Cliente: </strong><label>{{order_report.customer_name}}</label>
                         </v-col>
-                         <v-col cols="12" md="12" sm="12" class="text-left p-0">
+                        <v-col cols="12" md="12" sm="12" class="text-left p-0">
                           <strong>Direccion: </strong><label>{{order_report.address}}</label>
+                        </v-col>
+                        <v-col cols="12" md="12" sm="12" class="text-left p-0">
+                          <strong>NIT: </strong><label>{{order_report.nit}}</label>
                         </v-col>
                     </v-row>
                     <v-row>
@@ -226,10 +229,14 @@ import {
 export default {
   data() {
     return {
-      customer_id_rules: [
-        v => (v && v != 0) || 'Debe seleccionar un cliente',
-      ],
-      add_sale_valid:false,
+      rules: {
+        required: value => value !== "" || 'Campo obligatorio',
+        autocomplete_required: {
+          type: Boolean,
+          default: false,
+        },
+      },
+      valid_form:false,
       menu: false,
       search:'',
       overlay:false,
@@ -336,8 +343,11 @@ export default {
       axios.get('customerActive').then(function(response){
         $this.aviable_customers = response.data;
         $this.aviable_customers.forEach(function(item){
-              item.customer_name = item.first_name + " " + item.last_name;
+          item.customer_name = item.first_name + " " + item.last_name;
         })
+      }).catch(()=>{
+        this.overlay = false;
+        this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
       })
     },
     get_status_text(status){
@@ -361,6 +371,9 @@ export default {
         $this.order_report.total = total;
         $this.overlay = false;
         $this.dialogReport = true;
+      }).catch(()=>{
+        this.overlay = false;
+        this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
       })
     },
     initialize() {
@@ -374,6 +387,9 @@ export default {
               item.customer_name = item.first_name + " " + item.last_name;
             })
             $this.overlay = false;
+        }).catch(()=>{
+          this.overlay = false;
+          this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
         })
     },
 
@@ -399,6 +415,9 @@ export default {
           $this.orders.splice(edited_index, 1);
           console.log(JSON.stringify($this.orders[edited_index]))
           $this.overlay = false;
+      }).catch(()=>{
+        this.overlay = false;
+        this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
       })
       this.closeDelete();
       
@@ -412,6 +431,7 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
+      this.$refs.form.resetValidation();
     },
     closeReport(){
       this.dialogReport = false;
@@ -423,6 +443,9 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
+      if(this.$refs.form){
+        this.$refs.form.resetValidation();
+      }
     },
 
     redirect_order_detail(order_id){
@@ -440,6 +463,10 @@ export default {
 
     save(add_products) {
       this.$refs.form.validate();
+
+      if(!this.valid_form){
+        return;
+      }
       
       this.overlay = true;
       if (this.editedIndex > -1) {
@@ -452,7 +479,9 @@ export default {
             }else{
               $this.initialize();
             }
-            
+        }).catch(()=>{
+          this.overlay = false;
+          this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
         })
 
       } else {
@@ -466,11 +495,14 @@ export default {
               $this.orders.push(data);
               $this.overlay = false;
             }
-            
+        }).catch(()=>{
+          this.overlay = false;
+          this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
         })
         
       }
       this.close();
+      this.$refs.form.resetValidation();
     },
   },
 };

@@ -34,24 +34,27 @@
 
                 <v-card-text>
                   <v-container>
-                    <v-row>
-                      <v-col cols="12" sm="12" md="12">
-                        <v-text-field
-                          v-model="editedItem.category_name"
-                          label="Nombre categoria"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="12" md="12">
-                        <!-- <v-text-field
+                    <v-form
+                      ref="form"
+                      v-model="valid_form"
+                      
+                    >
+                      <v-row>
+                        <v-col cols="12" sm="12" md="12">
+                          <v-text-field
+                            v-model="editedItem.category_name"
+                            label="Nombre categoria"
+                            :rules="[rules.required]"
+                          ></v-text-field>
+                        </v-col>
+                        <v-col cols="12" sm="12" md="12">
+                        <v-checkbox
                           v-model="editedItem.is_active"
                           label="Activo"
-                        ></v-text-field> -->
-                       <v-checkbox
-                        v-model="editedItem.is_active"
-                        label="Activo"
-                      ></v-checkbox>
-                      </v-col>
-                    </v-row>
+                        ></v-checkbox>
+                        </v-col>
+                      </v-row>
+                    </v-form>
                   </v-container>
                 </v-card-text>
 
@@ -112,6 +115,10 @@ import {
 export default {
   data() {
     return {
+       rules: {
+        required: value => !!value || 'Campo obligatorio',
+      },
+      valid_form: true,
       search:'',
       overlay:false,
       dialog: false,
@@ -174,6 +181,9 @@ export default {
               item.text_active = $this.get_status_text(item.is_active)
             })
             $this.overlay = false;
+        }).catch(()=>{
+          this.overlay = false;
+          this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
         })
     },
 
@@ -199,6 +209,9 @@ export default {
           $this.categories.splice(edited_index, 1);
           console.log(JSON.stringify($this.categories[edited_index]))
           $this.overlay = false;
+      }).catch(()=>{
+        this.overlay = false;
+        this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
       })
       this.closeDelete();
       
@@ -210,6 +223,7 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
+      this.$refs.form.resetValidation();
     },
 
     closeDelete() {
@@ -218,15 +232,28 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
+      if(this.$refs.form){
+        this.$refs.form.resetValidation();
+      }
     },
 
     save() {
+
+      this.$refs.form.validate();
+
+      if(!this.valid_form){
+        return;
+      }
+
       this.overlay = true;
       if (this.editedIndex > -1) {
         let $this = this;
 
         axios.put("category/"+this.editedItem.category_id ,this.editedItem).then(()=>{
             $this.initialize();
+        }).catch(()=>{
+          this.overlay = false;
+          this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
         })
 
       } else {
@@ -236,10 +263,14 @@ export default {
             data.text_active = $this.get_status_text(data.is_active)
             $this.categories.push(data);
             $this.overlay = false;
+        }).catch(()=>{
+          this.overlay = false;
+          this.$swal("Error", "Ocurrio un error al realizar la operacion :(", "error");
         })
         
       }
       this.close();
+      this.$refs.form.resetValidation();
     },
   },
 };

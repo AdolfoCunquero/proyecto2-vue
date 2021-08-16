@@ -14,6 +14,11 @@ export default {
   name: 'CategoryView',
   components: {
     Category
+  },
+  created:function(){
+    if (!this.$session.exists()) {
+      this.$router.push('/');
+    }
   }
 }
 </script>

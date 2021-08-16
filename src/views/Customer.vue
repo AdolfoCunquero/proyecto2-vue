@@ -14,6 +14,11 @@ export default {
   name: 'CustomerView',
   components: {
     Customer
+  },
+  created:function(){
+    if (!this.$session.exists()) {
+      this.$router.push('/');
+    }
   }
 }
 </script>
