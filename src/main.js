@@ -8,8 +8,8 @@ import VueSession from 'vue-session'
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 
-//axios.defaults.baseURL = 'https://desarrollowebproyecto2.herokuapp.com/api/'
-axios.defaults.baseURL = 'http://localhost:8000/api/'
+axios.defaults.baseURL = 'https://desarrollowebproyecto2.herokuapp.com/api/'
+//axios.defaults.baseURL = 'http://localhost:8000/api/'
 
 Vue.config.productionTip = false
 Vue.use(VueSweetalert2);
